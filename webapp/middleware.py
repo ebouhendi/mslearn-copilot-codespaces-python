@@ -19,6 +19,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.window = window_seconds
         self.requests: dict[str, deque] = {}
         self.lock = Lock()
+        # expose self for tests so the request store can be cleared between runs
+        try:
+            app.state.rate_limiter = self
+        except Exception:
+            # app may not have state in some contexts; ignore if unavailable
+            pass
 
     async def dispatch(self, request: Request, call_next):
         client_ip = request.client.host if request.client else "unknown"
