@@ -2,7 +2,7 @@ import base64
 from typing import Union
 from os.path import dirname, abspath, join
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
