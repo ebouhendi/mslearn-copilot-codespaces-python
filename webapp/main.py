@@ -14,6 +14,15 @@ current_dir = dirname(abspath(__file__))
 static_path = join(current_dir, "static")
 
 app = FastAPI()
+
+# Basic logging configuration
+import logging
+logging.basicConfig(level=logging.INFO)
+
+# Rate limiting middleware (in-memory). Configure as needed.
+from .middleware import RateLimitMiddleware
+app.add_middleware(RateLimitMiddleware, max_requests=10, window_seconds=60)
+
 app.mount("/ui", StaticFiles(directory=static_path), name="ui")
 
 
@@ -96,3 +105,28 @@ def delete_user(user_id: int, user_service: UserService = Depends(get_user_servi
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
     return {'deleted': True}
+
+
+# -----------------------------
+# Centralized exception handlers
+# -----------------------------
+from fastapi.exceptions import RequestValidationError
+from fastapi import Request
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    logging.info(f"HTTP error: {exc.detail}")
+    return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logging.info("Request validation error")
+    return JSONResponse(status_code=422, content={"error": "Validation error", "details": exc.errors()})
+
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    logging.exception("Unhandled exception while processing request")
+    return JSONResponse(status_code=500, content={"error": "Internal server error"})
