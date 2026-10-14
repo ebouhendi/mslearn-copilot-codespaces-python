@@ -1,3 +1,7 @@
 fastapi==0.109.1
 pydantic
 uvicorn[standard]
+
+# Testing
+pytest
+pytest-mock
