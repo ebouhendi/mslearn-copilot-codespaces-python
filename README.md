@@ -11,6 +11,12 @@ Explore how you can modify a Python repository using code suggestions from GitHu
 
 ## 💪🏽 Exercise
 
+## Rate limiting and error handling
+
+This project now includes an in-memory per-IP rate limiter (development use only) and centralized JSON error handlers for HTTP errors and validation errors. Defaults: 10 requests / 60 seconds. For production, configure a Redis-backed store and a real identity-based keying strategy.
+
+## 💪🏽 Exercise
+
 The API already has a single endpoint to generate a token. Let's update the API by adding a new endpoint that accepts text and returns a list of tokens.
 
 ### 🛠 Step 1: Add a Pydantic model
